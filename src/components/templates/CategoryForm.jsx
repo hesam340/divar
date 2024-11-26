@@ -13,7 +13,6 @@ function CategoryForm() {
   const { mutate, isLoading, error, data } = useMutation(addCategory, {
     onSuccess: () => queryClient.invalidateQueries("get-categories"),
   });
-  console.log({ isLoading, error, data });
 
   const changeHandler = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });

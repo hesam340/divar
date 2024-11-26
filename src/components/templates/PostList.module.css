@@ -35,6 +35,23 @@
 }
 
 .post .price {
-  width: 150px;
+  display: flex;
+  width: 300px;
   text-align: center;
+  align-items: center;
+}
+
+.price button {
+  width: 50px;
+  height: 40px;
+  background-color: #e23f3f;
+  padding: 9px;
+  border-radius: 5px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+.price svg {
+  font-size: 1.2rem;
 }

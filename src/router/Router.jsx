@@ -8,6 +8,7 @@ import DashboardPage from "pages/DashboardPage";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { getProfile } from "services/user";
 import Loader from "components/modules/loader";
+import DetailsPage from "pages/DetailsPage";
 
 function Router() {
   const { isLoading, data, error } = useQuery(["profile"], getProfile);
@@ -17,6 +18,7 @@ function Router() {
   return (
     <Routes>
       <Route index element={<HomePage />} />
+      <Route path="/:id" element={<DetailsPage />} />
       <Route
         path="/auth"
         element={data ? <Navigate to="/dashboard" /> : <AuthPage />}

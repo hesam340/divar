@@ -1,26 +1,22 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FaRegTrashAlt } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 import Loader from "components/modules/Loader";
+import { deletePost } from "services/user";
 import { getPosts } from "services/user";
 import { sp } from "utils/numbers";
 
 import styles from "./PostList.module.css";
-import { useEffect, useState } from "react";
 
 function PostList() {
   const queryClient = useQueryClient();
-  const getPost = () => {
-    const { data, isLoading } = useQuery(["my-post-list"], getPosts, {
-      onSuccess: () => queryClient.invalidateQueries(),
-    });
-    setData({ ...data });
-    setIsLoading(isLoading);
-  };
-  useEffect(() => {
-    getPost();
-  }, []);
-  const [data, setData] = useState();
-  const [isLoading, setIsLoading] = useState(null);
+  const { data, isLoading } = useQuery(["my-post-list"], getPosts);
+
+  const { mutate,isLoading:isLoadingDelete } = useMutation(deletePost, {
+    onSuccess: () => queryClient.invalidateQueries("my-post-list"),
+  });
+
   const baseURL = import.meta.env.VITE_BASE_URL;
 
   return (
@@ -38,8 +34,21 @@ function PostList() {
                 <span>{post.options.content}</span>
               </div>
               <div className={styles.price}>
-                <p>{new Date(post.createdAt).toLocaleDateString("fa-IR")}</p>
-                <span>{sp(post.amount)} تومان</span>
+                <button
+                  onClick={() =>
+                    mutate(
+                      post._id,
+                      { onSuccess: (res) => toast.success(res.data.message) },
+                      { onError: (err) => toast.error("مشکلی پیش آمده است") }
+                    )
+                  }
+                >
+                  <FaRegTrashAlt />
+                </button>
+                <div>
+                  <p>{new Date(post.createdAt).toLocaleDateString("fa-IR")}</p>
+                  <span>{sp(post.amount)} تومان</span>
+                </div>
               </div>
             </div>
           ))}

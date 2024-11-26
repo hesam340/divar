@@ -5,6 +5,7 @@ import { getCategory } from "services/admin";
 
 import styles from "./CategoryList.module.css";
 import { deleteCategory } from "services/admin";
+import toast from "react-hot-toast";
 
 function CategoryList() {
   const queryClient = useQueryClient();
@@ -26,7 +27,17 @@ function CategoryList() {
               <h5>{i.name}</h5>
             </div>
             <div className={styles.info}>
-              <button onClick={() => mutate(i._id)}>حذف دسته بندی</button>
+              <button
+                onClick={() =>
+                  mutate(
+                    i._id,
+                    { onSuccess: (res) => toast.success("دسته بندی با موفقیت حذف گردید") },
+                    { onError: (res) => toast.error("مشکلی پیش آمده است") }
+                  )
+                }
+              >
+                حذف دسته بندی
+              </button>
               <p>slug : {i.slug}</p>
             </div>
           </div>

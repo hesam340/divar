@@ -1,0 +1,28 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+  margin: 50px;
+}
+
+.container div {
+  width: 500px;
+}
+
+.container span {
+  display: block;
+}
+
+.container div * {
+  border-bottom: 1px solid #cac8c8;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+}
+
+.container div p {
+  border: none;
+}
+
+.container img {
+  width: 500px;
+  border-radius: 10px;
+}

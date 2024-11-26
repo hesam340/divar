@@ -1,22 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { useState } from "react";
-import axios from "axios";
 
 import { getCategory } from "services/admin";
-import { getCookie } from "utils/cookie";
+import { addPost } from "services/user";
 
 import styles from "./AddPost.module.css";
-import toast from "react-hot-toast";
 
 function AddPost() {
+  const queryClient = useQueryClient();
   const [form, setForm] = useState({
     title: "",
     content: "",
     city: "",
-    category: "673b015d869abd7a63ffa9f9",
+    category: "",
     amount: null,
     images: null,
   });
+
+  const { mutate } = useMutation(addPost, {
+    onSuccess: () => queryClient.invalidateQueries("my-post-list"),
+  });
+
   const { data } = useQuery(["get-categories"], getCategory);
 
   const changeHandler = (event) => {
@@ -31,20 +36,34 @@ function AddPost() {
   const submitHandler = (event) => {
     event.preventDefault();
 
+    if (
+      !form.title ||
+      !form.content ||
+      !form.city ||
+      !form.category ||
+      !form.amount ||
+      !form.images
+    )
+      return;
+
     const formData = new FormData();
     for (let i in form) {
       formData.append(i, form[i]);
     }
-    const token = getCookie("accessToken");
-    axios
-      .post(`${import.meta.env.VITE_BASE_URL}post/create`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          authorization: `bearer ${token}`,
-        },
-      })
-      .then((res) => toast.success(res.data.message))
-      .catch((error) => toast.error("مشکلی پیش آمده است"));
+    mutate(
+      formData,
+      { onSuccess: (res) => toast.success(res?.data.message) },
+      { onError: (err) => toast.error("مشکلی پیش آمده است") }
+    );
+
+    setForm({
+      title: "",
+      content: "",
+      city: "",
+      category: "",
+      amount: "",
+      images: null,
+    });
   };
 
   return (
@@ -55,15 +74,20 @@ function AddPost() {
     >
       <h3>افزودن آگهی</h3>
       <label htmlFor="title">عنوان</label>
-      <input type="text" name="title" id="title" />
+      <input type="text" name="title" id="title" value={form.title} />
       <label htmlFor="content">توضیحات</label>
-      <textarea name="content" id="content"></textarea>
+      <textarea name="content" id="content" value={form.content}></textarea>
       <label htmlFor="amount">قیمت</label>
-      <input type="number" name="amount" id="amount" />
+      <input type="number" name="amount" id="amount" value={form.amount} />
       <label htmlFor="city">شهر</label>
-      <input type="text" name="city" id="city" />
+      <input type="text" name="city" id="city" value={form.city} />
       <label htmlFor="category">دسته بندی</label>
       <select name="category" id="category">
+        {!form.category && (
+          <option value={form.category} disabled selected="true">
+            انتخاب کنید ...
+          </option>
+        )}
         {data?.data.map((i) => (
           <option key={i._id} value={i._id}>
             {i.name}
@@ -71,7 +95,7 @@ function AddPost() {
         ))}
       </select>
       <label htmlFor="images">عکس</label>
-      <input type="file" name="images" id="images" />
+      <input type="file" name="images" id="images" value={null} />
       <button type="submit">ایجاد</button>
     </form>
   );

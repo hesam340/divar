@@ -6,6 +6,7 @@
 .sidebar li {
   display: flex;
   margin: 20px 0px;
+  cursor: pointer;
 }
 
 .sidebar li p {
